@@ -53,16 +53,31 @@ class LevenshteinChatBot:
         return self.answers[best_match_index]
 
 
+import pandas as pd
+import gradio as gr
+
+# 레벤슈타인 거리 계산 함수와 LevenshteinChatBot 클래스 코드는 생략합니다.
+
+class ChatHistory:
+    def __init__(self):
+        self.conversation = []
+
+    def add_message(self, sender, message):
+        self.conversation.append((sender, message))
+
+    def get_conversation(self):
+        return '\n'.join(f'{sender}: {message}' for sender, message in self.conversation)
+
+chat_history = ChatHistory()
+
 def chat(input_sentence):
     response = chatbot.find_best_answer(input_sentence)
-    return response
+    chat_history.add_message('You', input_sentence)
+    chat_history.add_message('Chatbot', response)
+    return chat_history.get_conversation()
 
-# CSV 파일 경로를 지정합니다.
 filepath = 'ChatbotData.csv'
-
-# 레벤슈타인 챗봇 인스턴스를 생성합니다.
 chatbot = LevenshteinChatBot(filepath)
 
-# Gradio 인터페이스를 정의하고 실행합니다.
-iface = gr.Interface(fn=chat, inputs="text", outputs="text")
+iface = gr.Interface(fn=chat, inputs=gr.inputs.Textbox(lines=2), outputs=gr.outputs.Textbox())
 iface.launch()
