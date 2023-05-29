@@ -53,31 +53,33 @@ class LevenshteinChatBot:
         return self.answers[best_match_index]
 
 
-import pandas as pd
-import gradio as gr
-
-# 레벤슈타인 거리 계산 함수와 LevenshteinChatBot 클래스 코드는 생략합니다.
-
+# 채팅 내역을 관리하는 클래스
 class ChatHistory:
     def __init__(self):
-        self.conversation = []
+        self.conversation = []  # 채팅 내역을 저장하는 리스트
 
+    # 채팅 내역에 메시지를 추가하는 메소드
     def add_message(self, sender, message):
-        self.conversation.append((sender, message))
+        self.conversation.append((sender, message))  # (발신자, 메시지) 튜플을 리스트에 추가
 
+    # 현재까지의 채팅 내역을 문자열로 반환하는 메소드
     def get_conversation(self):
-        return '\n'.join(f'{sender}: {message}' for sender, message in self.conversation)
+        return '\n'.join(f'{sender}: {message}' for sender, message in self.conversation)  # 각 채팅 메시지를 줄바꿈 문자로 연결
 
+# 채팅 내역을 관리하는 인스턴스 생성
 chat_history = ChatHistory()
 
+# Gradio 인터페이스에서 호출될 함수
 def chat(input_sentence):
-    response = chatbot.find_best_answer(input_sentence)
-    chat_history.add_message('You', input_sentence)
-    chat_history.add_message('Chatbot', response)
-    return chat_history.get_conversation()
+    response = chatbot.find_best_answer(input_sentence)  # 입력된 문장에 대한 가장 좋은 답변을 찾음
+    chat_history.add_message('You', input_sentence)  # 채팅 내역에 사용자의 메시지 추가
+    chat_history.add_message('Chatbot', response)  # 채팅 내역에 챗봇의 응답 추가
+    return chat_history.get_conversation()  # 현재까지의 채팅 내역을 반환
 
+# 챗봇을 초기화하고 학습 데이터를 불러옴
 filepath = 'ChatbotData.csv'
 chatbot = LevenshteinChatBot(filepath)
 
+# Gradio 인터페이스를 설정하고 실행
 iface = gr.Interface(fn=chat, inputs=gr.inputs.Textbox(lines=2), outputs=gr.outputs.Textbox())
 iface.launch()
