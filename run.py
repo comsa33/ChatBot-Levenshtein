@@ -1,8 +1,6 @@
 import pandas as pd
 import gradio as gr
 
-import pandas as pd
-
 
 # 레벤슈타인 거리 계산 함수
 def levenshtein_distance(s1, s2):
